@@ -2,8 +2,6 @@
 
 Machine Condition Intelligence is a condition-monitoring project that investigates how machine-learning models can diagnose bearing faults from vibration signals while remaining reliable across changes in operating load, measurement noise and sensor position.
 
-The project combines vibration signal processing, bearing fault knowledge, lightweight deep learning and unsupervised adaptation. It evaluates not only whether a model can recognise known faults, but also how well it performs when the conditions at inference differ from those encountered during training.
-
 ![Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation](reports/figures/sensor-shift.png)
 
 ## Overview
@@ -14,32 +12,11 @@ A change in motor load, measurement noise or sensor position can alter the chara
 
 This project investigates that problem using bearing vibration measurements from the Case Western Reserve University (CWRU) Bearing Dataset.
 
-The system classifies four bearing conditions:
-
-Normal operation
-
-Inner-race fault
-
-Ball fault
-
-Outer-race fault
-
 A lightweight one-dimensional convolutional neural network processes 2,048-sample vibration windows. Its performance is evaluated across unseen operating loads, different noise levels and an unseen sensor position. The project also investigates unsupervised adaptation, input-drift detection and efficient CPU deployment.
 
 ## Results
 
 The evaluation focuses on generalisation across operating conditions rather than relying exclusively on conventional random train/test splits.
-
-All classification results are reported using macro-F1 across the four bearing conditions.
-
-| Evaluation | Features + trees | Network | + noise training | + transfer training |
-|---|---|---|---|---|
-| New load (trained on three) | 1.00 | 1.00 | 1.00 | 1.00 |
-| New loads (trained on one) | 0.92 | 1.00 | 1.00 | 1.00 |
-| Noise at 0 dB | 0.52 | 0.68 | 1.00 | 1.00 |
-| Noise at −5 dB | 0.40 | 0.60 | 1.00 | 0.99 |
-| Unseen sensor | 0.31 | 0.42 | 0.23 | 0.69 |
-| Unseen sensor, adapted | | 0.47 | 0.53 | **0.84** |
 
 Macro-F1 across the four conditions. Load results average four folds, and sensor results average four folds and three seeds.
 
@@ -57,6 +34,8 @@ Sixteen recordings from the [Case Western Reserve University bearing dataset](ht
 Each recording is trimmed to 10 seconds and cut into 2048-sample windows. Splits always hold out whole recordings, so no recording contributes to both training and testing.
 
 ## Method
+
+The model is organised into independent stages for data acquisition, signal preparation, feature extraction, model development, training, evaluation, deployment and monitoring.
 
 ![Model architecture](docs/architecture.png)
 

@@ -32,14 +32,7 @@ Machine Condition Intelligence is a compact model that identifies bearing faults
 
 Each change is tested on data the model has not seen, and scored with macro-F1 across the four conditions. A baseline of ten hand-crafted vibration features with gradient-boosted trees is shown for reference.
 
-| Condition | Model | Baseline |
-|---|---|---|
-| New motor load, trained on three loads | 1.00 | 1.00 |
-| New motor loads, trained on one load | 1.00 | 0.92 |
-| Noise at 0 dB | 1.00 | 0.52 |
-| Noise at −5 dB | 0.99 | 0.40 |
-| New sensor position | 0.69 | 0.31 |
-| New sensor position, after adaptation | 0.84 | |
+![Macro-F1 under a new motor load and under noise](reports/figures/comparison.png)
 
 ![Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation](reports/figures/sensor-shift.png)
 

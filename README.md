@@ -1,16 +1,36 @@
 # Machine Condition Intelligence
 
-Bearing fault diagnosis from vibration signals, evaluated under changes in motor load, noise and sensor position.
+Machine Condition Intelligence is a condition-monitoring project that investigates how machine-learning models can diagnose bearing faults from vibration signals while remaining reliable across changes in operating load, measurement noise and sensor position.
+
+The project combines vibration signal processing, bearing fault knowledge, lightweight deep learning and unsupervised adaptation. It evaluates not only whether a model can recognise known faults, but also how well it performs when the conditions at inference differ from those encountered during training.
 
 ![Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation](reports/figures/sensor-shift.png)
 
 ## Overview
 
-Fault diagnosis models often perform well on laboratory data and degrade in the field, where the load, the noise level and the sensor position differ from training. This project builds a small convolutional network for bearing fault diagnosis and evaluates it against each of these changes separately.
+Predictive maintenance depends on the ability to identify developing mechanical faults before they lead to equipment failure. Vibration-based machine learning offers a way to automate this process, but models trained under controlled conditions can become unreliable when deployed in a different operating environment.
 
-The model classifies four conditions (normal, inner-race fault, ball fault, outer-race fault) from 2048-sample vibration windows, adapts to an unseen sensor without labels, detects input drift, and runs as a 41 KB ONNX model.
+A change in motor load, measurement noise or sensor position can alter the characteristics of the incoming signal. The model must distinguish these changes from the mechanical faults it is designed to recognise.
+
+This project investigates that problem using bearing vibration measurements from the Case Western Reserve University (CWRU) Bearing Dataset.
+
+The system classifies four bearing conditions:
+
+Normal operation
+
+Inner-race fault
+
+Ball fault
+
+Outer-race fault
+
+A lightweight one-dimensional convolutional neural network processes 2,048-sample vibration windows. Its performance is evaluated across unseen operating loads, different noise levels and an unseen sensor position. The project also investigates unsupervised adaptation, input-drift detection and efficient CPU deployment.
 
 ## Results
+
+The evaluation focuses on generalisation across operating conditions rather than relying exclusively on conventional random train/test splits.
+
+All classification results are reported using macro-F1 across the four bearing conditions.
 
 | Evaluation | Features + trees | Network | + noise training | + transfer training |
 |---|---|---|---|---|

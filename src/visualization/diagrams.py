@@ -1,4 +1,4 @@
-"""Documentation diagram: the network's architecture.
+"""Documentation diagrams: the model as a file, and its architecture.
 
 The layout: a soft frame with a title, a symmetric row of raised
 cards, each with an icon, a name and a short description, and small arrows
@@ -161,5 +161,101 @@ def architecture() -> None:
         ("Output", "Bearing condition", icon_bearing),
     ], "architecture")
 
+
+# The model as a file -------------------------------------------------------
+
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.path import Path as Shape
+from matplotlib.patches import PathPatch
+
+
+def fill(axis, patch, colors, angle=90, z=3):
+    """Fill a patch with a linear gradient; angle 90 runs bottom to top."""
+    axis.add_patch(patch)
+    patch.set_facecolor("none")
+    patch.set_edgecolor("none")
+    x0, y0, x1, y1 = patch.get_path().transformed(patch.get_patch_transform()).get_extents().bounds
+    x1, y1 = x0 + x1, y0 + y1
+    t = np.radians(angle)
+    gx, gy = np.meshgrid(np.linspace(0, 1, 256), np.linspace(0, 1, 256))
+    ramp = gx * np.cos(t) + gy * np.sin(t)
+    ramp = (ramp - ramp.min()) / (ramp.max() - ramp.min())
+    image = axis.imshow(ramp, extent=(x0, x1, y0, y1), origin="lower", zorder=z,
+                        cmap=LinearSegmentedColormap.from_list("", colors), interpolation="bicubic")
+    image.set_clip_path(patch)
+
+
+def corner(points, centre, radius, start, end):
+    angles = np.linspace(np.radians(start), np.radians(end), 12)
+    points += [(centre[0] + radius * np.cos(a), centre[1] + radius * np.sin(a)) for a in angles]
+
+
+def page(x, y, w, h, fold, radius):
+    """A document outline with rounded corners and a folded top-right corner."""
+    points = []
+    corner(points, (x + radius, y + radius), radius, 180, 270)
+    corner(points, (x + w - radius, y + radius), radius, 270, 360)
+    points += [(x + w, y + h - fold), (x + w - fold, y + h)]
+    corner(points, (x + radius, y + h - radius), radius, 90, 180)
+    return PathPatch(Shape(points + [points[0]], closed=True))
+
+
+def squircle(x, y, size, radius):
+    return FancyBboxPatch((x, y), size, size, boxstyle=f"round,pad=0,rounding_size={radius}")
+
+
+def ring(cx, cy, outer, inner):
+    path = Shape.make_compound_path(Shape.circle((cx, cy), outer),
+                                    Shape(Shape.circle((cx, cy), inner).vertices[::-1]))
+    return PathPatch(path)
+
+
+def model_file() -> None:
+    """The released model shown as what it is: a single ONNX file."""
+    style.apply()
+    width, height = 7 * CARD_W + 6 * GAP + 2 * MARGIN, 7.2
+    figure, axis = plt.subplots(figsize=(width / 1.45, height / 1.45))
+    axis.set_xlim(0, width)
+    axis.set_ylim(0, height)
+    axis.set_aspect("equal")
+    axis.axis("off")
+    rounded(axis, 0, 0, width, height, FRAME, FRAME_RADIUS, z=1)
+
+    w, h, fold = 2.55, 3.4, 0.62                                              # document proportions, 3:4
+    x, y = width / 2 - w / 2, 2.5
+    cx, cy = width / 2, y + 1.95
+
+    for spread, alpha in ((0.32, 0.04), (0.2, 0.06), (0.1, 0.09), (0.03, 0.14)):   # soft lift
+        shadow = page(x - spread, y - spread - 0.12, w + 2 * spread, h + 2 * spread, fold + spread, 0.2 + spread)
+        shadow.set(facecolor="black", edgecolor="none", alpha=alpha, zorder=2)
+        axis.add_patch(shadow)
+
+    sheet = page(x, y, w, h, fold, 0.2)
+    fill(axis, sheet, ["#18181B", "#232327", "#303035"], z=3)                # lit from above
+    rim = page(x, y, w, h, fold, 0.2)
+    rim.set(facecolor="none", edgecolor="#3E3E44", linewidth=1, zorder=4)
+    axis.add_patch(rim)
+    flap = PathPatch(Shape([(x + w - fold, y + h), (x + w - fold, y + h - fold + 0.1),
+                            (x + w - fold + 0.1, y + h - fold), (x + w, y + h - fold),
+                            (x + w - fold, y + h)], closed=True))
+    fill(axis, flap, ["#3E3E44", "#5A5A61"], angle=45, z=4)
+
+    accent = ["#6A3F72", SOFT, BASE]                                              # the bearing, in the deeper accent
+    fill(axis, ring(cx, cy, 0.58, 0.46), accent, angle=60, z=6)
+    fill(axis, ring(cx, cy, 0.26, 0.16), accent, angle=60, z=6)
+    for angle in np.linspace(0, 2 * np.pi, 9)[:-1]:
+        bx, by = cx + 0.36 * np.cos(angle), cy + 0.36 * np.sin(angle)
+        fill(axis, Circle((bx, by), 0.064), [SOFT, BASE], angle=60, z=6)
+    axis.text(width / 2, y + 0.55, "ONNX", ha="center", va="center", fontsize=10.5,
+              fontweight="semibold", color="#9A9AA0", zorder=6)
+
+    axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
+              fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)
+    axis.text(width / 2, 1.25, "model-int8.onnx  \u00b7  21,604 parameters  \u00b7  41 KB", ha="center", va="center", fontsize=9,
+              color=style.NEUTRAL["secondary"], zorder=6)
+
+    style.save(figure, DOCS, "model", panel=False)
+
 if __name__ == "__main__":
+    model_file()
     architecture()

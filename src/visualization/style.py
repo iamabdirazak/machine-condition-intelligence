@@ -25,12 +25,12 @@ SHADES = {
 }
 
 NEUTRAL = {
-    "background": "#161618",
-    "surface": "#242427",
+    "background": "#0E0E10",
+    "surface": "#1C1C1F",
     "ink": "#F5F5F7",
     "secondary": "#A1A1A6",
     "tertiary": "#6E6E73",
-    "hairline": "#333336",
+    "hairline": "#2C2C30",
 }
 
 COLORS = {

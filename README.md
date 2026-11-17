@@ -18,7 +18,9 @@ Machine Condition Intelligence is a compact model that identifies bearing faults
 
 **Pooling.** Pooling averages each channel across the window, giving 64 values that describe which patterns are present. A fault is recognised wherever it falls within the window.
 
-**Classification.** A linear layer turns the 64 values into a score for each of the four conditions, and the highest score is the prediction. The whole model has 21,604 parameters.
+**Classification.** A linear layer turns the 64 values into a score for each of the four conditions. This final layer completes a model of 21,604 parameters.
+
+**Output.** The scores are converted into probabilities, and the condition with the highest probability is the prediction, whether normal or an inner-race, ball or outer-race fault. Its probability is returned with it as the model's confidence.
 
 ## How It Performs
 

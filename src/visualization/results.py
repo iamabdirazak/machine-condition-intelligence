@@ -76,8 +76,8 @@ def plot(model: str = "baseline") -> None:
 
 
 APPROACHES = {
-    "baseline": ("Features + trees", style.COLORS["normal"]),
-    "convolution-clean": ("Network", style.SHADES["muted"]),
+    "baseline": ("Baseline", style.COLORS["normal"]),
+    "convolution-clean": ("Model", style.SHADES["muted"]),
     "convolution": ("+ noise training", style.SHADES["soft"]),
     "convolution-transfer": ("+ transfer training", style.SHADES["base"]),
 }

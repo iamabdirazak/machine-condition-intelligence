@@ -19,7 +19,7 @@ FRAME, CARD, ARROW = style.NEUTRAL["background"], style.NEUTRAL["surface"], styl
 CARD_W, CARD_H, GAP = 2.6, 3.4, 0.41  # portrait cards, like the UAV figure
 MARGIN = 0.4  # around the row of cards, equal to CARD_Y
 CARD_Y = 0.4
-CARD_RADIUS = 0.34  # the frame's corner is this plus the margin, so the two curves are concentric
+CARD_RADIUS, FRAME_RADIUS = 0.27, 0.38  # in proportion to the UAV figure's cards and frame
 HEIGHT = CARD_Y + CARD_H + 1.0  # room above the cards for the title
 ICON_Y = CARD_Y + 2.25
 NAME_Y, SUBTITLE_Y = CARD_Y + 1.05, CARD_Y + 0.65
@@ -129,7 +129,7 @@ def diagram(title: str, cards: list[tuple], name: str) -> None:
     axis.set_aspect("equal")
     axis.axis("off")
 
-    rounded(axis, 0, 0, width, HEIGHT, FRAME, CARD_RADIUS + CARD_Y, z=1)
+    rounded(axis, 0, 0, width, HEIGHT, FRAME, FRAME_RADIUS, z=1)
     axis.text(width / 2, HEIGHT - 0.5, title, ha="center", va="center", fontsize=13,
               fontweight="medium", color=style.NEUTRAL["ink"], zorder=6)
 

@@ -147,7 +147,7 @@ def legend(figure, items: list[tuple[str, object, str]], anchor=(1.0, 1.0)) -> N
 
 
 PADDING = 0.3  # inches of background around the content
-RADIUS = 0.22  # inches, the corner of every figure's panel
+ROUNDING = 0.018  # corner radius as a share of panel width, as in the UAV figures
 
 
 def save(figure, directory: Path, name: str, panel: bool = True) -> None:
@@ -165,7 +165,7 @@ def save(figure, directory: Path, name: str, panel: bool = True) -> None:
         width, height = figure.get_size_inches()
         figure.add_artist(FancyBboxPatch(
             (content.x0 / width, content.y0 / height), content.width / width, content.height / height,
-            boxstyle=f"round,pad=0,rounding_size={RADIUS / width}", mutation_aspect=width / height,
+            boxstyle=f"round,pad=0,rounding_size={ROUNDING * content.width / width}", mutation_aspect=width / height,
             transform=figure.transFigure, facecolor=NEUTRAL["background"], edgecolor="none", zorder=-10,
         ))
     figure.patch.set_alpha(0)

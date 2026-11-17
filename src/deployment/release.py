@@ -4,7 +4,6 @@ Usage: python -m src.deployment.release
 """
 
 import json
-from datetime import date
 
 import numpy as np
 import torch
@@ -22,7 +21,7 @@ SETTINGS = train.Settings(transfer=True)
 
 
 def release() -> dict:
-    folder = MODELS / f"{date.today().isoformat()}-network"
+    folder = MODELS
     signals = [windowing.trim(s) for s in cwru.load_all("DE")]
     training = windowing.cut(signals, hop=splitting.TRAIN_HOP)
     drive_end = windowing.cut(signals)

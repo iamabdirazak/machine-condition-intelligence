@@ -1,6 +1,6 @@
 """Classifying vibration with a released model. Needs only NumPy and ONNX Runtime.
 
-    classifier = Classifier(Path("models/2026-11-17-network"))
+    classifier = Classifier(Path("models"))
     condition, confidence = classifier(window)   # window: 2048 samples at 12 kHz
 """
 

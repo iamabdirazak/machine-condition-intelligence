@@ -4,13 +4,7 @@
 
 Machine Condition Intelligence is a compact model that identifies bearing faults from vibration. It reads a short window of accelerometer signal and returns the condition of the bearing. The model is built to stay accurate when the motor load, the noise level or the sensor position changes, adapts to a new sensor without labelled data, and flags input that no longer resembles its training data.
 
-| | |
-|---|---|
-| **Input** | 2048 samples from one accelerometer at 12 kHz, about 0.17 seconds |
-| **Output** | Normal, inner-race fault, ball fault or outer-race fault, with a confidence |
-| **Format** | ONNX, 8-bit (`model-int8.onnx`, 41 KB) or 32-bit (`model.onnx`, 88 KB) |
-| **Parameters** | 21,604 |
-| **Runtime** | ONNX Runtime and NumPy, 0.02 ms per window on one CPU thread |
+![Input: 2048 samples at 12 kHz. Output: normal, inner-race, ball or outer-race fault. Format: ONNX, 8-bit 41 KB or 32-bit 88 KB. Parameters: 21,604. Runtime: 0.02 ms per window on one CPU thread.](docs/specification.png)
 
 ## How It Works
 

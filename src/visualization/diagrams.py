@@ -8,6 +8,7 @@ between them.
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Circle, FancyBboxPatch, Polygon
+from PIL import Image
 
 from src.paths import ROOT
 from src.visualization import style
@@ -204,10 +205,21 @@ def squircle(x, y, size, radius):
     return FancyBboxPatch((x, y), size, size, boxstyle=f"round,pad=0,rounding_size={radius}")
 
 
-def ring(cx, cy, outer, inner):
-    path = Shape.make_compound_path(Shape.circle((cx, cy), outer),
-                                    Shape(Shape.circle((cx, cy), inner).vertices[::-1]))
-    return PathPatch(path)
+def onnx_mark() -> np.ndarray:
+    """The ONNX mark from docs/onnx.png, without its wordmark, recoloured for a dark page.
+
+    Lines become light; the facets keep their shading as faint translucent white.
+    """
+    source = np.asarray(Image.open(DOCS / "onnx.png").convert("RGBA")).astype(float) / 255
+    mark = source[:575]                                                        # above the wordmark
+    rows, columns = np.where(mark[..., 3] > 0.05)
+    mark = mark[rows.min():rows.max() + 1, columns.min():columns.max() + 1]
+    lightness, alpha = mark[..., :3].mean(axis=2), mark[..., 3]
+    line = lightness < 0.5
+    image = np.ones_like(mark)
+    image[..., :3] = np.where(line[..., None], (0.91, 0.91, 0.93), 1.0)
+    image[..., 3] = np.where(line, alpha, alpha * np.clip((1 - lightness) * 1.6, 0.04, 0.4))
+    return image
 
 
 def model_file() -> None:
@@ -223,7 +235,7 @@ def model_file() -> None:
 
     w, h, fold = 2.55, 3.4, 0.62                                              # document proportions, 3:4
     x, y = width / 2 - w / 2, 2.5
-    cx, cy = width / 2, y + 1.95
+    cx = width / 2
 
     for spread, alpha in ((0.32, 0.04), (0.2, 0.06), (0.1, 0.09), (0.03, 0.14)):   # soft lift
         shadow = page(x - spread, y - spread - 0.12, w + 2 * spread, h + 2 * spread, fold + spread, 0.2 + spread)
@@ -240,14 +252,14 @@ def model_file() -> None:
                             (x + w - fold, y + h)], closed=True))
     fill(axis, flap, ["#3E3E44", "#5A5A61"], angle=45, z=4)
 
-    accent = ["#6A3F72", SOFT, BASE]                                              # the bearing, in the deeper accent
-    fill(axis, ring(cx, cy, 0.58, 0.46), accent, angle=60, z=6)
-    fill(axis, ring(cx, cy, 0.26, 0.16), accent, angle=60, z=6)
-    for angle in np.linspace(0, 2 * np.pi, 9)[:-1]:
-        bx, by = cx + 0.36 * np.cos(angle), cy + 0.36 * np.sin(angle)
-        fill(axis, Circle((bx, by), 0.064), [SOFT, BASE], angle=60, z=6)
-    axis.text(width / 2, y + 0.55, "ONNX", ha="center", va="center", fontsize=10.5,
-              fontweight="semibold", color="#9A9AA0", zorder=6)
+    mark = onnx_mark()
+    size = 1.3                                                                 # about half the page width
+    aspect = mark.shape[0] / mark.shape[1]
+    top = y + h - 0.95
+    axis.imshow(mark, extent=(cx - size / 2, cx + size / 2, top - size * aspect, top),
+                zorder=6, interpolation="lanczos")
+    axis.text(cx, y + 0.55, "ONNX", ha="center", va="center", fontsize=10.5,
+              fontweight="semibold", color="#A1A1A6", zorder=6)
 
     axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
               fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)

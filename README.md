@@ -8,17 +8,17 @@ Machine Condition Intelligence is a compact model that identifies bearing faults
 
 ![Model architecture](docs/architecture.png)
 
-**A short window of vibration.** The model reads 2048 samples of acceleration, about 0.17 seconds recorded at 12 kHz by a sensor on the motor housing. That is long enough to contain many fault impacts at every motor speed in the data.
+**Input.** The model reads 2048 samples of acceleration, about 0.17 seconds recorded at 12 kHz by a sensor on the motor housing. That is long enough to contain many fault impacts at every motor speed in the data.
 
-**Normalised inside the model.** Each window is shifted to zero mean and scaled to unit variance, so the model responds to the shape of the signal rather than its level. Because this step is part of the model, the exported file needs no separate preprocessing.
+**Normalisation.** Each window is shifted to zero mean and scaled to unit variance, so the model responds to the shape of the signal rather than its level. Because this step is part of the model, the exported file needs no separate preprocessing.
 
-**Filters learned from the raw signal.** A bearing fault produces a train of small impacts that ring in a band of frequencies. The first layer, a wide convolution 64 samples long with a stride of 8, learns 16 frequency filters that pick out the bands carrying those impacts.
+**Frequency filters.** A bearing fault produces a train of small impacts that ring in a band of frequencies. The first layer, a wide convolution 64 samples long with a stride of 8, learns 16 frequency filters that pick out the bands carrying those impacts.
 
-**Patterns built up over time.** Three convolution blocks, each with batch normalisation, ReLU and max pooling, combine the filtered signals into 64 channels. Together they respond to how the impacts repeat over time, which is what tells one fault from another.
+**Convolution.** Three convolution blocks, each with batch normalisation, ReLU and max pooling, combine the filtered signals into 64 channels. Together they respond to how the impacts repeat over time, which is what tells one fault from another.
 
-**A summary that ignores timing.** Pooling averages each channel across the window, giving 64 values that describe which patterns are present. A fault is recognised wherever it falls within the window.
+**Pooling.** Pooling averages each channel across the window, giving 64 values that describe which patterns are present. A fault is recognised wherever it falls within the window.
 
-**One decision.** A linear layer turns the 64 values into a score for each of the four conditions, and the highest score is the prediction. The whole model has 21,604 parameters.
+**Classification.** A linear layer turns the 64 values into a score for each of the four conditions, and the highest score is the prediction. The whole model has 21,604 parameters.
 
 ## How It Performs
 
@@ -30,9 +30,7 @@ The model is tested only on recordings it has not seen, under each change separa
   <sub><b>Load shift and noise.</b> Left, macro-F1 when the model is tested at a motor load it was not trained on, after training on three loads or on a single load. Every version of the model reaches 1.00, while the baseline falls to 0.92 when trained on one load. Right, macro-F1 as noise is added to the test signal, from a signal-to-noise ratio of 20 dB down to −5 dB, where the noise is stronger than the vibration itself. The baseline falls to 0.40 and the model trained without augmentation to 0.60, while both versions trained with noise stay at 0.99 or above.</sub>
 </p>
 
-<br>
-
-*Once exported to an 8-bit file, the released model makes the same decision as the full 32-bit model on 100% of drive-end windows and 98.8% of fan-end windows.*
+*The released model, exported as an 8-bit file, makes the same decision as the full 32-bit model on 100% of drive-end windows and 98.8% of fan-end windows.*
 
 ## How It Adapts
 

@@ -265,7 +265,7 @@ def model_file() -> None:
     axis.imshow(mark, extent=(cx - size / 2, cx + size / 2, top - size * aspect, top),
                 zorder=6, interpolation="lanczos")
     axis.text(cx, top - block + label / 2, "ONNX", ha="center", va="center", fontsize=15,
-              fontweight="semibold", color="#C7C7CC", zorder=6)
+              fontweight="medium", color="#8E8E93", alpha=0.85, zorder=6)    # quieter than the mark
 
     axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
               fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)

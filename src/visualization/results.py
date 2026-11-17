@@ -143,15 +143,15 @@ def sensor_shift(name: str = "sensor-shift") -> None:
     figure, axis = plt.subplots(figsize=(9, 3))
     axis.set_ylim(0, 1.1)
     grouped_bars(axis, [label for label, _ in APPROACHES.values()], {
-        "before": ([mean_f1(reports[a]["sensor shift"]) for a in APPROACHES], style.SHADES["soft"]),
+        "before": ([mean_f1(reports[a]["sensor shift"]) for a in APPROACHES], style.SHADES["strong"]),
         "after": ([mean_f1(reports[a]["sensor shift, adapted"]) if a in NETWORKS else None for a in APPROACHES],
-                  style.SHADES["strong"]),
+                  style.SHADES["soft"]),
     }, width=0.28)
     axis.set_ylabel("Macro-F1")
     axis.set_title("Fan-end sensor, unseen in training")
     figure.subplots_adjust(top=0.8)
-    style.legend(figure, [("swatch", style.SHADES["soft"], "Before adaptation"),
-                          ("swatch", style.SHADES["strong"], "After adaptation")], anchor=(0.9, 0.95))
+    style.legend(figure, [("swatch", style.SHADES["strong"], "Before adaptation"),
+                          ("swatch", style.SHADES["soft"], "After adaptation")], anchor=(0.9, 0.95))
     save(figure, name)
 
 

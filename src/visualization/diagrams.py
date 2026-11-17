@@ -231,9 +231,9 @@ def model_file() -> None:
         axis.add_patch(shadow)
 
     sheet = page(x, y, w, h, fold, 0.2)
-    fill(axis, sheet, ["#18181B", "#232327", "#303035"], z=3)                # lit from above
+    fill(axis, sheet, ["#1D1D20", "#2A2A2E", "#38383D"], z=3)                # lit from above
     rim = page(x, y, w, h, fold, 0.2)
-    rim.set(facecolor="none", edgecolor="#3E3E44", linewidth=1, zorder=4)
+    rim.set(facecolor="none", edgecolor="#4A4A50", linewidth=1, zorder=4)
     axis.add_patch(rim)
     flap = PathPatch(Shape([(x + w - fold, y + h), (x + w - fold, y + h - fold + 0.1),
                             (x + w - fold + 0.1, y + h - fold), (x + w, y + h - fold),
@@ -249,7 +249,7 @@ def model_file() -> None:
     axis.text(width / 2, y + 0.55, "ONNX", ha="center", va="center", fontsize=10.5,
               fontweight="semibold", color="#9A9AA0", zorder=6)
 
-    axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
+    axis.text(width / 2, 1.7, "Machine Condition Intelligence", ha="center", va="center", fontsize=14,
               fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)
     axis.text(width / 2, 1.25, "model-int8.onnx  \u00b7  21,604 parameters  \u00b7  41 KB", ha="center", va="center", fontsize=9,
               color=style.NEUTRAL["secondary"], zorder=6)

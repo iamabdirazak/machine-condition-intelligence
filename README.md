@@ -16,9 +16,13 @@ A bearing fault announces itself as a train of small impacts, each one striking 
 
 The model is tested only on recordings it has not seen, under each change separately, and scored with macro-F1 across the four conditions. A baseline of ten hand-crafted vibration features with gradient-boosted trees, the approach an experienced vibration engineer would take, is shown for reference alongside three versions of the model that differ only in how they were trained. The released model is the one trained with noise and transfer.
 
-![Macro-F1 under a new motor load and under noise](reports/figures/comparison.png)
+<p>
+  <img src="reports/figures/comparison.png" alt="Macro-F1 under a new motor load and under noise">
+  <br>
+  <sub><b>Load shift and noise.</b> Left, macro-F1 when the model is tested at a motor load it was not trained on, after training on three loads or on a single load. Every version of the model reaches 1.00, while the baseline falls to 0.92 when trained on one load. Right, macro-F1 as noise is added to the test signal, from a signal-to-noise ratio of 20 dB down to −5 dB, where the noise is stronger than the vibration itself. The baseline falls to 0.40 and the model trained without augmentation to 0.60, while both versions trained with noise stay at 0.99 or above.</sub>
+</p>
 
-<sub>**Load shift and noise.** Left, macro-F1 when the model is tested at a motor load it was not trained on, after training on three loads or on a single load. Every version of the model reaches 1.00, while the baseline falls to 0.92 when trained on one load. Right, macro-F1 as noise is added to the test signal, from a signal-to-noise ratio of 20 dB down to −5 dB, where the noise is stronger than the vibration itself. The baseline falls to 0.40 and the model trained without augmentation to 0.60, while both versions trained with noise stay at 0.99 or above.</sub>
+<br>
 
 The released model is exported as an 8-bit file that makes the same decision as the full 32-bit model on 100% of drive-end windows and 98.8% of fan-end windows.
 
@@ -26,13 +30,19 @@ The released model is exported as an 8-bit file that makes the same decision as 
 
 A sensor mounted elsewhere on the machine hears the same bearing through a different path, which changes the levels the model was calibrated for. The model adapts by re-estimating the statistics of its batch-normalisation layers from unlabelled windows recorded at the new position, a method known as AdaBN. No labels are needed and no weights are retrained. To know when adaptation is needed, the model also watches its own input. Each batch of 32 windows is compared with the training data using the 64 pooled values, and an alarm is raised when the difference exceeds the level that 99% of training batches stay below.
 
-![Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation](reports/figures/sensor-shift.png)
+<p>
+  <img src="reports/figures/sensor-shift.png" alt="Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation">
+  <br>
+  <sub><b>A new sensor position.</b> Macro-F1 on the fan-end sensor, which no version saw in training, before and after adaptation. A new position is the hardest change for every approach. Training with noise alone lowers the score to 0.23, because the model learns to rely on detail that the new path removes. Training with noise and transfer reaches 0.69, and adaptation raises it to 0.84.</sub>
+</p>
 
-<sub>**A new sensor position.** Macro-F1 on the fan-end sensor, which no version saw in training, before and after adaptation. A new position is the hardest change for every approach. Training with noise alone lowers the score to 0.23, because the model learns to rely on detail that the new path removes. Training with noise and transfer reaches 0.69, and adaptation raises it to 0.84.</sub>
+<br>
 
-![Share of batches flagged as drift under each change](reports/figures/drift-alarms.png)
-
-<sub>**Drift alarms.** The share of batches flagged as drift under each change. The released model, trained with noise and transfer, raises no alarms for a new load or for noise at 0 dB, both changes it handles well, and flags 75% of batches from the unseen sensor, which is the change that calls for adaptation. The model trained without augmentation also flags 39% of noisy batches, since noise is a change it cannot handle.</sub>
+<p>
+  <img src="reports/figures/drift-alarms.png" alt="Share of batches flagged as drift under each change">
+  <br>
+  <sub><b>Drift alarms.</b> The share of batches flagged as drift under each change. The released model, trained with noise and transfer, raises no alarms for a new load or for noise at 0 dB, both changes it handles well, and flags 75% of batches from the unseen sensor, which is the change that calls for adaptation. The model trained without augmentation also flags 39% of noisy batches, since noise is a change it cannot handle.</sub>
+</p>
 
 ## How It Was Trained
 
@@ -40,13 +50,19 @@ The model is trained on sixteen recordings from the [Case Western Reserve Univer
 
 In each epoch, about half of the training windows receive white noise at a random signal-to-noise ratio between 20 dB and −5 dB, and a random filter that simulates the path vibration takes to a sensor mounted elsewhere. Training runs for 15 epochs with AdamW, a learning rate of 0.001 and a batch size of 64. The released model is trained on all drive-end recordings.
 
-![Waveform and envelope spectrum of each condition at 0 hp](reports/figures/fault-signatures.png)
+<p>
+  <img src="reports/figures/fault-signatures.png" alt="Waveform and envelope spectrum of each condition at 0 hp">
+  <br>
+  <sub><b>What the model learns from.</b> Left, 100 ms of drive-end vibration for each condition at 0 hp. Right, the envelope spectrum of each signal, which reveals how often the fault impacts repeat. Each fault produces a peak at its own frequency, set by the bearing's geometry and the shaft speed (BPFI for the inner race, BSF for the ball and BPFO for the outer race), with dashed lines marking the predicted frequency and its harmonics. The peaks fall where the physics predicts, which confirms the labels before any training.</sub>
+</p>
 
-<sub>**What the model learns from.** Left, 100 ms of drive-end vibration for each condition at 0 hp. Right, the envelope spectrum of each signal, which reveals how often the fault impacts repeat. Each fault produces a peak at its own frequency, set by the bearing's geometry and the shaft speed (BPFI for the inner race, BSF for the ball and BPFO for the outer race), with dashed lines marking the predicted frequency and its harmonics. The peaks fall where the physics predicts, which confirms the labels before any training.</sub>
+<br>
 
-![Leave-one-load-out splits](reports/figures/load-splits.png)
-
-<sub>**How the model is tested.** Each panel is one test fold. Every recording at one motor load is held out for testing, shown in colour, and the model is trained on the other three loads, shown in grey. Holding out whole recordings keeps near-identical windows from the same recording out of both sides of the split.</sub>
+<p>
+  <img src="reports/figures/load-splits.png" alt="Leave-one-load-out splits">
+  <br>
+  <sub><b>How the model is tested.</b> Each panel is one test fold. Every recording at one motor load is held out for testing, shown in colour, and the model is trained on the other three loads, shown in grey. Holding out whole recordings keeps near-identical windows from the same recording out of both sides of the split.</sub>
+</p>
 
 ## How to Use It
 
@@ -87,3 +103,7 @@ python -m pytest -q                      # run the tests
 ## License
 
 The code is released under the MIT License. The data belongs to the Case Western Reserve University Bearing Data Center and is not redistributed.
+
+## Author
+
+Abdirazak Mubarak, November 2026

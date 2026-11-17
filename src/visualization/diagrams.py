@@ -274,42 +274,7 @@ def model_file() -> None:
 
     style.save(figure, DOCS, "model", panel=False)
 
-# The model at a glance -----------------------------------------------------
-
-def specification() -> None:
-    """The model's key facts as a row of tiles: what a reader checks first."""
-    tiles = [("Input", "2048 samples", "One accelerometer at 12 kHz"),
-             ("Output", "Bearing condition", "Normal or one of three faults"),
-             ("Format", "ONNX", "8-bit 41 KB, 32-bit 88 KB"),
-             ("Parameters", "21,604", "Convolutional model"),
-             ("Runtime", "0.02 ms", "Per window, on one CPU thread")]
-    style.apply()
-    width = 7 * CARD_W + 6 * GAP + 2 * MARGIN
-    tile_w = (width - 2 * MARGIN - (len(tiles) - 1) * GAP) / len(tiles)
-    tile_h = 1.75
-    height = tile_h + 2 * CARD_Y
-    figure, axis = plt.subplots(figsize=(width / 1.45, height / 1.45))
-    axis.set_xlim(0, width)
-    axis.set_ylim(0, height)
-    axis.set_aspect("equal")
-    axis.axis("off")
-    rounded(axis, 0, 0, width, height, FRAME, FRAME_RADIUS, z=1)
-
-    for index, (label, value, detail) in enumerate(tiles):
-        x = MARGIN + index * (tile_w + GAP)
-        rounded(axis, x, CARD_Y, tile_w, tile_h, CARD, CARD_RADIUS, z=2)
-        left, top = x + 0.32, CARD_Y + tile_h
-        axis.text(left, top - 0.38, label, ha="left", va="center", fontsize=7.4,
-                  color=style.NEUTRAL["secondary"], zorder=6)
-        axis.text(left, top - 0.86, value, ha="left", va="center", fontsize=12.5,
-                  fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)
-        axis.text(left, top - 1.32, detail, ha="left", va="center", fontsize=7.4,
-                  color=style.NEUTRAL["secondary"], zorder=6)
-
-    style.save(figure, DOCS, "specification", panel=False)
-
 
 if __name__ == "__main__":
     model_file()
-    specification()
     architecture()

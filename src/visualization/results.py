@@ -77,9 +77,9 @@ def plot(model: str = "baseline") -> None:
 
 APPROACHES = {
     "baseline": ("Baseline", style.COLORS["normal"]),
-    "convolution-clean": ("Model", style.SHADES["muted"]),
-    "convolution": ("+ noise training", style.SHADES["soft"]),
-    "convolution-transfer": ("+ transfer training", style.SHADES["base"]),
+    "convolution-clean": ("No augmentation", style.SHADES["muted"]),
+    "convolution": ("Noise", style.SHADES["soft"]),
+    "convolution-transfer": ("Noise and transfer", style.SHADES["base"]),
 }
 NETWORKS = [a for a in APPROACHES if a != "baseline"]
 

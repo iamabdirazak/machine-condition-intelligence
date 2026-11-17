@@ -40,10 +40,7 @@ def plot(signals: list[Signal], name: str = "fault-signatures") -> None:
     style.legend(figure, [("dash", style.NEUTRAL["secondary"], "Predicted fault frequency and harmonics")],
                  anchor=(0.9, 0.975))
 
-    FIGURES.mkdir(parents=True, exist_ok=True)
-    for extension in ("svg", "png"):
-        figure.savefig(FIGURES / f"{name}.{extension}")
-    plt.close(figure)
+    style.save(figure, FIGURES, name)
 
 
 def draw_waveform(axis, signal: Signal, color: str) -> None:

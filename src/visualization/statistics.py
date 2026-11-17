@@ -43,10 +43,7 @@ def plot(audit: Path = REPORTS / "audit.csv", name: str = "signal-statistics") -
         axis.set_xticks(list(positions), [style.LABELS[c] for c in conditions])
         axis.axhline(0, color=style.NEUTRAL["tertiary"], linewidth=0.8, zorder=1)
 
-    FIGURES.mkdir(parents=True, exist_ok=True)
-    for extension in ("svg", "png"):
-        figure.savefig(FIGURES / f"{name}.{extension}")
-    plt.close(figure)
+    style.save(figure, FIGURES, name)
 
 
 if __name__ == "__main__":

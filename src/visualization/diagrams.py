@@ -147,10 +147,7 @@ def diagram(title: str, cards: list[tuple], name: str) -> None:
             axis.add_patch(Polygon([[mid - 0.07, MIDDLE - 0.12], [mid - 0.07, MIDDLE + 0.12], [mid + 0.09, MIDDLE]],
                                    facecolor=ARROW, edgecolor="none", zorder=3))
 
-    DOCS.mkdir(parents=True, exist_ok=True)
-    for extension in ("svg", "png"):
-        figure.savefig(DOCS / f"{name}.{extension}", pad_inches=0.05, facecolor=style.NEUTRAL["background"])
-    plt.close(figure)
+    style.save(figure, DOCS, name, panel=False)
 
 
 def architecture() -> None:

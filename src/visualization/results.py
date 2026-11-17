@@ -64,10 +64,7 @@ def noise(results: dict, name: str) -> None:
 
 
 def save(figure, name: str) -> None:
-    FIGURES.mkdir(parents=True, exist_ok=True)
-    for extension in ("svg", "png"):
-        figure.savefig(FIGURES / f"{name}.{extension}")
-    plt.close(figure)
+    style.save(figure, FIGURES, name)
 
 
 def plot(model: str = "baseline") -> None:

@@ -47,10 +47,7 @@ def plot(name: str = "load-splits") -> None:
         ("swatch", [style.COLORS[c] for c in CONDITIONS], "Test"),
     ], anchor=(0.9, 0.97))
 
-    FIGURES.mkdir(parents=True, exist_ok=True)
-    for extension in ("svg", "png"):
-        figure.savefig(FIGURES / f"{name}.{extension}")
-    plt.close(figure)
+    style.save(figure, FIGURES, name)
 
 
 if __name__ == "__main__":

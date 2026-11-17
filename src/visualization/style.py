@@ -9,6 +9,8 @@ shades separate the three fault types, and neutral grey is kept for the
 healthy machine, so colour always means "fault".
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
@@ -76,9 +78,6 @@ def apply() -> None:
         "lines.linewidth": 0.9,
         "legend.frameon": False,
         "figure.dpi": 200,
-        "savefig.bbox": "tight",
-        "savefig.pad_inches": 0.15,
-        "savefig.facecolor": NEUTRAL["background"],
         "figure.facecolor": NEUTRAL["background"],
         "axes.facecolor": NEUTRAL["background"],
     })
@@ -145,3 +144,34 @@ def legend(figure, items: list[tuple[str, object, str]], anchor=(1.0, 1.0)) -> N
                   bbox_to_anchor=anchor, ncol=len(items), fontsize=8,
                   handlelength=1.6, handleheight=0.9, columnspacing=1.6, handletextpad=0.6,
                   labelcolor=NEUTRAL["secondary"])
+
+
+PADDING = 0.3  # inches of background around the content
+RADIUS = 0.22  # inches, the corner of every figure's panel
+
+
+def save(figure, directory: Path, name: str, panel: bool = True) -> None:
+    """Save as SVG and PNG on a rounded panel, transparent beyond its corners.
+
+    The panel wraps the figure's content with even padding. Diagrams that
+    draw their own rounded frame pass panel=False.
+    """
+    figure.canvas.draw()
+    content = figure.get_tightbbox(figure.canvas.get_renderer())
+    if panel:
+        content = content.padded(PADDING)
+        # Placed in figure fractions, which follow the crop when saving; the
+        # aspect keeps the corner a true circle on a non-square figure.
+        width, height = figure.get_size_inches()
+        figure.add_artist(FancyBboxPatch(
+            (content.x0 / width, content.y0 / height), content.width / width, content.height / height,
+            boxstyle=f"round,pad=0,rounding_size={RADIUS / width}", mutation_aspect=width / height,
+            transform=figure.transFigure, facecolor=NEUTRAL["background"], edgecolor="none", zorder=-10,
+        ))
+    figure.patch.set_alpha(0)
+    for axis in figure.axes:
+        axis.patch.set_alpha(0)
+    directory.mkdir(parents=True, exist_ok=True)
+    for extension in ("svg", "png"):
+        figure.savefig(directory / f"{name}.{extension}", bbox_inches=content, pad_inches=0, transparent=True)
+    plt.close(figure)

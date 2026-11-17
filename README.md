@@ -4,6 +4,8 @@
 
 Machine Condition Intelligence is a compact model that identifies bearing faults from vibration. It reads a short window of accelerometer signal and returns the condition of the bearing. The model is built to stay accurate when the motor load, the noise level or the sensor position changes, adapts to a new sensor without labelled data, and flags input that no longer resembles its training data.
 
+![Input: 2048 samples at 12 kHz. Output: normal, inner-race, ball or outer-race fault. Format: ONNX, 8-bit 41 KB or 32-bit 88 KB. Parameters: 21,604. Runtime: 0.02 ms per window on one CPU thread.](docs/specification.png)
+
 ## How It Works
 
 ![Model architecture](docs/architecture.png)

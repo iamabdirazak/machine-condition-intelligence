@@ -5,6 +5,7 @@ cards, each with an icon, a name and a short description, and small arrows
 between them.
 """
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Circle, FancyBboxPatch, Polygon
@@ -206,9 +207,10 @@ def squircle(x, y, size, radius):
 
 
 def onnx_mark() -> np.ndarray:
-    """The ONNX mark from docs/onnx.png, without its wordmark, recoloured for a dark page.
+    """The ONNX mark from docs/onnx.png, without its wordmark, recoloured in the accent.
 
-    Lines become light; the facets keep their shading as faint translucent white.
+    Lines take the brightest shade. Each facet keeps its original shading, mapped
+    from the deepest shade for the darkest facet to the base shade for the lightest.
     """
     source = np.asarray(Image.open(DOCS / "onnx.png").convert("RGBA")).astype(float) / 255
     mark = source[:575]                                                        # above the wordmark
@@ -216,9 +218,11 @@ def onnx_mark() -> np.ndarray:
     mark = mark[rows.min():rows.max() + 1, columns.min():columns.max() + 1]
     lightness, alpha = mark[..., :3].mean(axis=2), mark[..., 3]
     line = lightness < 0.5
-    image = np.ones_like(mark)
-    image[..., :3] = np.where(line[..., None], (0.91, 0.91, 0.93), 1.0)
-    image[..., 3] = np.where(line, alpha, alpha * np.clip((1 - lightness) * 1.6, 0.04, 0.4))
+    facets = LinearSegmentedColormap.from_list("", [MUTED, SOFT, BASE])
+    shade = np.clip((lightness - 0.6) / 0.38, 0, 1)                           # facet greys span about 0.6 to 0.98
+    image = np.empty_like(mark)
+    image[..., :3] = np.where(line[..., None], matplotlib.colors.to_rgb(STRONG), facets(shade)[..., :3])
+    image[..., 3] = np.where(line, alpha, alpha * 0.9)
     return image
 
 
@@ -255,11 +259,13 @@ def model_file() -> None:
     mark = onnx_mark()
     size = 1.3                                                                 # about half the page width
     aspect = mark.shape[0] / mark.shape[1]
-    top = y + h - 0.95
+    label = 0.3                                                                # cap height of the label
+    block = size * aspect + 0.36 + label                                       # mark, gap, label
+    top = y + h * 0.47 + block / 2                                             # centred, just below the middle
     axis.imshow(mark, extent=(cx - size / 2, cx + size / 2, top - size * aspect, top),
                 zorder=6, interpolation="lanczos")
-    axis.text(cx, y + 0.55, "ONNX", ha="center", va="center", fontsize=10.5,
-              fontweight="semibold", color="#A1A1A6", zorder=6)
+    axis.text(cx, top - block + label / 2, "ONNX", ha="center", va="center", fontsize=15,
+              fontweight="semibold", color="#C7C7CC", zorder=6)
 
     axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
               fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)

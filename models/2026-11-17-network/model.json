@@ -1,0 +1,81 @@
+{
+  "name": "Machine condition intelligence",
+  "task": "Bearing condition from drive-end vibration: normal, inner-race, ball, outer-race",
+  "classes": [
+    "normal",
+    "inner-race",
+    "ball",
+    "outer-race"
+  ],
+  "window": {
+    "samples": 2048,
+    "sample_rate": 12000,
+    "seconds": 0.171
+  },
+  "training": {
+    "data": "CWRU, drive-end sensor, 0.007-inch faults, loads 0\u20133 hp, 10 s per recording",
+    "settings": {
+      "epochs": 15,
+      "batch": 64,
+      "learning_rate": 0.001,
+      "augment": true,
+      "transfer": true,
+      "noise_range_db": [
+        -5.0,
+        20.0
+      ],
+      "augmented_share": 0.5,
+      "seed": 0
+    }
+  },
+  "parameters": 21604,
+  "files": {
+    "model.onnx": {
+      "kilobytes": 88.4,
+      "milliseconds_per_window": 0.049
+    },
+    "model-int8.onnx": {
+      "kilobytes": 40.7,
+      "milliseconds_per_window": 0.022
+    }
+  },
+  "parity": {
+    "drive end": {
+      "model.onnx": {
+        "largest_difference": 4.76837158203125e-06,
+        "same_decision": 1.0
+      },
+      "model-int8.onnx": {
+        "largest_difference": 0.09485352039337158,
+        "same_decision": 1.0
+      }
+    },
+    "fan end": {
+      "model.onnx": {
+        "largest_difference": 3.814697265625e-06,
+        "same_decision": 1.0
+      },
+      "model-int8.onnx": {
+        "largest_difference": 1.7100419998168945,
+        "same_decision": 0.9881465517241379
+      }
+    }
+  },
+  "fan_end_sensor_without_adaptation": {
+    "model.onnx": 0.8689,
+    "model-int8.onnx": 0.8792
+  },
+  "evaluation": {
+    "leave_one_load_out": 1.0,
+    "single_load": 1.0,
+    "noise_0_db": 1.0,
+    "sensor_shift": 0.69,
+    "sensor_shift_adapted": 0.838
+  },
+  "limits": [
+    "One bearing type (SKF 6205) on one test rig; other machines need validation.",
+    "One fault size (0.007 inch); larger faults were not used in training.",
+    "A different sensor position lowers accuracy; adapt with unlabelled data before trusting it.",
+    "Noise in training was white Gaussian; very strong coloured noise is a known weakness."
+  ]
+}

@@ -1,0 +1,20 @@
+[project]
+name = "machine-condition-intelligence"
+version = "0.1.0"
+description = "Bearing fault diagnosis from vibration that stays reliable when operating conditions change."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Abdirazak Mubarak" }]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "scikit-learn",
+    "torch",
+    "onnx",
+    "onnxruntime",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]

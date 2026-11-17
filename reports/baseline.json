@@ -1,0 +1,382 @@
+{
+  "leave one load out": {
+    "0 hp": {
+      "macro_f1": 0.9871,
+      "accuracy": 0.9871,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.9483,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          58,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          55,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          58,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          58
+        ]
+      ]
+    },
+    "1 hp": {
+      "macro_f1": 1.0,
+      "accuracy": 1.0,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          58,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          58,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          58,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          58
+        ]
+      ]
+    },
+    "2 hp": {
+      "macro_f1": 1.0,
+      "accuracy": 1.0,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          58,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          58,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          58,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          58
+        ]
+      ]
+    },
+    "3 hp": {
+      "macro_f1": 1.0,
+      "accuracy": 1.0,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          58,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          58,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          58,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          58
+        ]
+      ]
+    }
+  },
+  "single load": {
+    "0 hp": {
+      "macro_f1": 0.889,
+      "accuracy": 0.8951,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.5805,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          174,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          101,
+          6,
+          67
+        ],
+        [
+          0,
+          0,
+          174,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          174
+        ]
+      ]
+    },
+    "1 hp": {
+      "macro_f1": 0.8667,
+      "accuracy": 0.8736,
+      "recall": {
+        "normal": 0.9598,
+        "inner-race": 0.5402,
+        "ball": 0.9943,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          167,
+          2,
+          5,
+          0
+        ],
+        [
+          0,
+          94,
+          3,
+          77
+        ],
+        [
+          0,
+          1,
+          173,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          174
+        ]
+      ]
+    },
+    "2 hp": {
+      "macro_f1": 0.9319,
+      "accuracy": 0.9325,
+      "recall": {
+        "normal": 0.9828,
+        "inner-race": 0.7816,
+        "ball": 0.9655,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          171,
+          1,
+          2,
+          0
+        ],
+        [
+          0,
+          136,
+          0,
+          38
+        ],
+        [
+          0,
+          6,
+          168,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          174
+        ]
+      ]
+    },
+    "3 hp": {
+      "macro_f1": 0.9971,
+      "accuracy": 0.9971,
+      "recall": {
+        "normal": 0.9885,
+        "inner-race": 1.0,
+        "ball": 1.0,
+        "outer-race": 1.0
+      },
+      "confusion": [
+        [
+          172,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          174,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          174,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          174
+        ]
+      ]
+    }
+  },
+  "noise": {
+    "20 dB": {
+      "macro_f1": 0.9946,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.9785,
+        "ball": 1.0,
+        "outer-race": 1.0
+      }
+    },
+    "10 dB": {
+      "macro_f1": 0.9621,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.8578,
+        "ball": 0.9957,
+        "outer-race": 1.0
+      }
+    },
+    "5 dB": {
+      "macro_f1": 0.9225,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.806,
+        "ball": 0.8922,
+        "outer-race": 1.0
+      }
+    },
+    "0 dB": {
+      "macro_f1": 0.5211,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.375,
+        "ball": 0.0172,
+        "outer-race": 1.0
+      }
+    },
+    "-5 dB": {
+      "macro_f1": 0.4021,
+      "recall": {
+        "normal": 0.9914,
+        "inner-race": 0.0,
+        "ball": 0.0,
+        "outer-race": 1.0
+      }
+    }
+  },
+  "sensor shift": {
+    "0 hp": {
+      "macro_f1": 0.402,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 0.1379,
+        "outer-race": 0.0
+      }
+    },
+    "1 hp": {
+      "macro_f1": 0.3403,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 0.0,
+        "outer-race": 0.0
+      }
+    },
+    "2 hp": {
+      "macro_f1": 0.3923,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 1.0,
+        "ball": 0.0172,
+        "outer-race": 0.0
+      }
+    },
+    "3 hp": {
+      "macro_f1": 0.125,
+      "recall": {
+        "normal": 1.0,
+        "inner-race": 0.0,
+        "ball": 0.0,
+        "outer-race": 0.0
+      }
+    }
+  },
+  "sensor shift spread": {
+    "before": 0.1121
+  }
+}

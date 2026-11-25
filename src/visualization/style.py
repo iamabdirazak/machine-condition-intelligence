@@ -1,7 +1,7 @@
 """One visual language for every figure: dark, flat, legible, one accent.
 
-The figures are drawn for a dark page, in the manner of Apple's dark
-appearance: near-black background, soft white text, quiet hairlines.
+Every figure is drawn twice, for Apple's light and dark appearances, and the
+README shows the one that matches the reader's setting.
 
 The accent is aubergine. Its shades are named by emphasis, not by lightness,
 so "strong" is the shade that stands out most against the background. The
@@ -9,29 +9,32 @@ shades separate the three fault types, and neutral grey is kept for the
 healthy machine, so colour always means "fault".
 """
 
+import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
-ACCENT = "#B06FB9"
+THEME = os.environ.get("THEME", "light")  # set THEME=dark to draw the dark versions
+
+ACCENT = "#B06FB9" if THEME == "dark" else "#9A55A6"
 
 SHADES = {
-    "strong": "#E8C9EE",
-    "base": ACCENT,
-    "soft": "#7C4F84",
-    "muted": "#57405C",
-    "faint": "#3A2D3E",
-}
+    "dark": {"strong": "#E8C9EE", "base": ACCENT, "soft": "#7C4F84", "muted": "#57405C", "faint": "#3A2D3E"},
+    "light": {"strong": "#5E2A68", "base": ACCENT, "soft": "#C49BCC", "muted": "#DCC4E1", "faint": "#EFE4F1"},
+}[THEME]
 
 NEUTRAL = {
-    "background": "#161618",
-    "surface": "#242427",
-    "ink": "#F5F5F7",
-    "secondary": "#A1A1A6",
-    "tertiary": "#6E6E73",
-    "hairline": "#333336",
-}
+    "dark": {"background": "#161618", "surface": "#242427", "ink": "#F5F5F7",
+             "secondary": "#A1A1A6", "tertiary": "#6E6E73", "hairline": "#333336"},
+    "light": {"background": "#F5F5F7", "surface": "#FFFFFF", "ink": "#1D1D1F",
+              "secondary": "#6E6E73", "tertiary": "#A1A1A6", "hairline": "#D2D2D7"},
+}[THEME]
+
+PAGE = {  # the model-file icon: page gradient, rim, fold gradient, label
+    "dark": {"sheet": ["#1D1D20", "#2A2A2E", "#38383D"], "rim": "#4A4A50", "fold": ["#3E3E44", "#5A5A61"], "label": "#8E8E93"},
+    "light": {"sheet": ["#E6E6EA", "#F4F4F6", "#FFFFFF"], "rim": "#D2D2D7", "fold": ["#D8D8DD", "#EEEEF1"], "label": "#8E8E93"},
+}[THEME]
 
 COLORS = {
     "normal": "#8E8E93",
@@ -173,5 +176,5 @@ def save(figure, directory: Path, name: str, panel: bool = True) -> None:
         axis.patch.set_alpha(0)
     directory.mkdir(parents=True, exist_ok=True)
     for extension in ("svg", "png"):
-        figure.savefig(directory / f"{name}.{extension}", bbox_inches=content, pad_inches=0, transparent=True)
+        figure.savefig(directory / f"{name}{'-dark' if THEME == 'dark' else ''}.{extension}", bbox_inches=content, pad_inches=0, transparent=True)
     plt.close(figure)

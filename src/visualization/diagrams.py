@@ -218,10 +218,11 @@ def onnx_mark() -> np.ndarray:
     mark = mark[rows.min():rows.max() + 1, columns.min():columns.max() + 1]
     lightness, alpha = mark[..., :3].mean(axis=2), mark[..., 3]
     line = lightness < 0.5
-    facets = LinearSegmentedColormap.from_list("", [MUTED, SOFT, BASE])
+    dark = style.THEME == "dark"
+    facets = LinearSegmentedColormap.from_list("", [MUTED, SOFT, BASE] if dark else [STRONG, BASE, SOFT])
     shade = np.clip((lightness - 0.6) / 0.38, 0, 1)                           # facet greys span about 0.6 to 0.98
     image = np.empty_like(mark)
-    image[..., :3] = np.where(line[..., None], matplotlib.colors.to_rgb(STRONG), facets(shade)[..., :3])
+    image[..., :3] = np.where(line[..., None], matplotlib.colors.to_rgb(STRONG if dark else "#FFFFFF"), facets(shade)[..., :3])
     image[..., 3] = np.where(line, alpha, alpha * 0.9)
     return image
 
@@ -243,18 +244,18 @@ def model_file() -> None:
 
     for spread, alpha in ((0.32, 0.04), (0.2, 0.06), (0.1, 0.09), (0.03, 0.14)):   # soft lift
         shadow = page(x - spread, y - spread - 0.12, w + 2 * spread, h + 2 * spread, fold + spread, 0.2 + spread)
-        shadow.set(facecolor="black", edgecolor="none", alpha=alpha, zorder=2)
+        shadow.set(facecolor="black", edgecolor="none", alpha=alpha * (1 if style.THEME == "dark" else 0.25), zorder=2)
         axis.add_patch(shadow)
 
     sheet = page(x, y, w, h, fold, 0.2)
-    fill(axis, sheet, ["#1D1D20", "#2A2A2E", "#38383D"], z=3)                # lit from above
+    fill(axis, sheet, style.PAGE["sheet"], z=3)                # lit from above
     rim = page(x, y, w, h, fold, 0.2)
-    rim.set(facecolor="none", edgecolor="#4A4A50", linewidth=1, zorder=4)
+    rim.set(facecolor="none", edgecolor=style.PAGE["rim"], linewidth=1, zorder=4)
     axis.add_patch(rim)
     flap = PathPatch(Shape([(x + w - fold, y + h), (x + w - fold, y + h - fold + 0.1),
                             (x + w - fold + 0.1, y + h - fold), (x + w, y + h - fold),
                             (x + w - fold, y + h)], closed=True))
-    fill(axis, flap, ["#3E3E44", "#5A5A61"], angle=45, z=4)
+    fill(axis, flap, style.PAGE["fold"], angle=45, z=4)
 
     mark = onnx_mark()
     size = 1.3                                                                 # about half the page width
@@ -265,7 +266,7 @@ def model_file() -> None:
     axis.imshow(mark, extent=(cx - size / 2, cx + size / 2, top - size * aspect, top),
                 zorder=6, interpolation="lanczos")
     axis.text(cx, top - block + label / 2, "ONNX", ha="center", va="center", fontsize=15,
-              fontweight="medium", color="#8E8E93", alpha=0.85, zorder=6)    # quieter than the mark
+              fontweight="medium", color=style.PAGE["label"], alpha=0.85, zorder=6)    # quieter than the mark
 
     axis.text(width / 2, 1.7, "Machine Condition Model", ha="center", va="center", fontsize=14,
               fontweight="semibold", color=style.NEUTRAL["ink"], zorder=6)

@@ -1,12 +1,18 @@
 # Machine Condition Intelligence
 
-![Machine Condition Model](docs/model.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/model-dark.png">
+  <img src="docs/model.png" alt="Machine Condition Model">
+</picture>
 
 Machine Condition Intelligence is a compact model that identifies bearing faults from vibration. It reads a short window of accelerometer signal and returns the condition of the bearing. The model is built to stay accurate when the motor load, the noise level or the sensor position changes, adapts to a new sensor without labelled data, and flags input that no longer resembles its training data. Its decisions are checked against the bearing's physics: envelope demodulation at the fault frequencies set by the bearing's geometry agrees with the model on every normal, inner-race and outer-race window, and the model carries the ball faults that the envelope cannot see.
 
 ## How It Works
 
-![Model architecture](docs/architecture.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.png">
+  <img src="docs/architecture.png" alt="Model architecture">
+</picture>
 
 **Input.** The model reads 2048 samples of acceleration, about 0.17 seconds recorded at 12 kHz by a sensor on the motor housing. That is long enough to contain many fault impacts at every motor speed in the data.
 
@@ -38,7 +44,11 @@ Each impact is brief, and what the accelerometer records is the structure ringin
 
 <p>
 <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/physics-dark.png">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/physics-dark.png">
   <img src="reports/figures/physics.png" alt="Windows named correctly by envelope physics alone and by the model">
+</picture>
 </picture>
 <br>
 <sub><b>Physics and model.</b> The share of drive-end windows, across all four loads, whose condition is named correctly by envelope physics alone and by the released model. Physics and the model agree on every normal, inner-race and outer-race window. On ball-fault windows the envelope shows no peak at twice the ball spin frequency, only about 1.3 times its noise floor, and physics calls the bearing normal. The model still names them, from what else the ball defect does to the signal.</sub>
@@ -46,12 +56,29 @@ Each impact is brief, and what the accelerometer records is the structure ringin
 
 Ball faults in this dataset are known to be hard to see by envelope analysis (Smith and Randall, *Mechanical Systems and Signal Processing*, 2015). Here that is where the learned model earns its place: physics confirms its decisions wherever physics can see, and the model carries the one case physics cannot.
 
+## Where It Fits
+
+The model is designed for rolling-element bearings on rotating machines, watched by an accelerometer near the bearing, where the bearing's geometry and the shaft speed are known.
+
+| The situation | The design |
+| :-- | :-- |
+| A defect strikes once per ball pass, at a frequency set by geometry and speed | Envelope physics checks every decision the model makes |
+| Load and speed change in operation | Trained across loads, and scored on a load it never saw |
+| Plants are noisy and sensors are not always where they were at training | Trained with noise, adapted to a new sensor position without labels, and watching its own input for drift |
+| A ball defect barely shows in the envelope | The learned model names it where physics alone cannot |
+| The monitor runs beside the machine on a small CPU | An 8-bit ONNX model of 41 KB, 0.02 ms per window |
+
+Some situations call for a different design. Faults that grow over months need a trend of health over time, which run-to-failure data supports and this dataset, with faults seeded into healthy bearings, does not. Gears, misalignment and looseness have their own vibration signatures that this model was not trained on.
+
 ## How It Performs
 
 The model is tested only on recordings it has not seen, under each change separately, and scored with macro-F1 across the four conditions. A baseline of ten hand-crafted vibration features with gradient-boosted trees, the approach an experienced vibration engineer would take, is shown for reference alongside three versions of the model that differ only in how they were trained. The released model is the one trained with noise and transfer.
 
 <p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/comparison-dark.png">
   <img src="reports/figures/comparison.png" alt="Macro-F1 under a new motor load and under noise">
+</picture>
   <br>
   <sub><b>Load shift and noise.</b> Left, macro-F1 when the model is tested at a motor load it was not trained on, after training on three loads or on a single load. Every version of the model reaches 1.00, while the baseline falls to 0.92 when trained on one load. Right, macro-F1 as noise is added to the test signal, from a signal-to-noise ratio of 20 dB down to −5 dB, where the noise is stronger than the vibration itself. The baseline falls to 0.40 and the model trained without augmentation to 0.60, while both versions trained with noise stay at 0.99 or above.</sub>
 </p>
@@ -63,7 +90,10 @@ The model is tested only on recordings it has not seen, under each change separa
 A sensor mounted elsewhere on the machine hears the same bearing through a different path, which changes the levels the model was calibrated for. The model adapts by re-estimating the statistics of its batch-normalisation layers from unlabelled windows recorded at the new position, a method known as AdaBN. No labels are needed and no weights are retrained. To know when adaptation is needed, the model also watches its own input. Each batch of 32 windows is compared with the training data using the 64 pooled values, and an alarm is raised when the difference exceeds the level that 99% of training batches stay below.
 
 <p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/sensor-shift-dark.png">
   <img src="reports/figures/sensor-shift.png" alt="Macro-F1 on the fan-end sensor, unseen in training, before and after adaptation">
+</picture>
   <br>
   <sub><b>A new sensor position.</b> Macro-F1 on the fan-end sensor, which no version saw in training, before and after adaptation. A new position is the hardest change for every approach. Training with noise alone lowers the score to 0.23, because the model learns to rely on detail that the new path removes. Training with noise and transfer reaches 0.69, and adaptation raises it to 0.84.</sub>
 </p>
@@ -71,7 +101,10 @@ A sensor mounted elsewhere on the machine hears the same bearing through a diffe
 <br>
 
 <p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/drift-alarms-dark.png">
   <img src="reports/figures/drift-alarms.png" alt="Share of batches flagged as drift under each change">
+</picture>
   <br>
   <sub><b>Drift alarms.</b> The share of batches flagged as drift under each change. The released model, trained with noise and transfer, raises no alarms for a new load or for noise at 0 dB, both changes it handles well, and flags 75% of batches from the unseen sensor, which is the change that calls for adaptation. The model trained without augmentation also flags 39% of noisy batches, since noise is a change it cannot handle.</sub>
 </p>
@@ -83,7 +116,10 @@ The model is trained on sixteen recordings from the [Case Western Reserve Univer
 In each epoch, about half of the training windows receive white noise at a random signal-to-noise ratio between 20 dB and −5 dB, and a random filter that simulates the path vibration takes to a sensor mounted elsewhere. Training runs for 15 epochs with AdamW, a learning rate of 0.001 and a batch size of 64. The released model is trained on all drive-end recordings.
 
 <p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/fault-signatures-dark.png">
   <img src="reports/figures/fault-signatures.png" alt="Waveform and envelope spectrum of each condition at 0 hp">
+</picture>
   <br>
   <sub><b>What the model learns from.</b> Left, 100 ms of drive-end vibration for each condition at 0 hp. Right, the envelope spectrum of each signal, which reveals how often the fault impacts repeat. Each fault produces a peak at its own frequency, set by the bearing's geometry and the shaft speed (BPFI for the inner race, BSF for the ball and BPFO for the outer race), with dashed lines marking the predicted frequency and its harmonics. The peaks fall where the physics predicts, which confirms the labels before any training.</sub>
 </p>
@@ -91,7 +127,10 @@ In each epoch, about half of the training windows receive white noise at a rando
 <br>
 
 <p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/load-splits-dark.png">
   <img src="reports/figures/load-splits.png" alt="Leave-one-load-out splits">
+</picture>
   <br>
   <sub><b>How the model is tested.</b> Each panel is one test fold. Every recording at one motor load is held out for testing, shown in colour, and the model is trained on the other three loads, shown in grey. Holding out whole recordings keeps near-identical windows from the same recording out of both sides of the split.</sub>
 </p>

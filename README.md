@@ -2,7 +2,7 @@
 
 ![Machine Condition Model](docs/model.png)
 
-Machine Condition Intelligence is a compact model that identifies bearing faults from vibration. It reads a short window of accelerometer signal and returns the condition of the bearing. The model is built to stay accurate when the motor load, the noise level or the sensor position changes, adapts to a new sensor without labelled data, and flags input that no longer resembles its training data.
+Machine Condition Intelligence is a compact model that identifies bearing faults from vibration. It reads a short window of accelerometer signal and returns the condition of the bearing. The model is built to stay accurate when the motor load, the noise level or the sensor position changes, adapts to a new sensor without labelled data, and flags input that no longer resembles its training data. Its decisions are checked against the bearing's physics: envelope demodulation at the fault frequencies set by the bearing's geometry agrees with the model on every normal, inner-race and outer-race window, and the model carries the ball faults that the envelope cannot see.
 
 ## How It Works
 
@@ -21,6 +21,30 @@ Machine Condition Intelligence is a compact model that identifies bearing faults
 **Classification.** A linear layer turns the 64 values into a score for each of the four conditions. This final layer completes a model of 21,604 parameters.
 
 **Output.** The scores are converted into probabilities, and the condition with the highest probability is the prediction, whether normal or an inner-race, ball or outer-race fault. Its probability is returned with it as the model's confidence.
+
+## The Physics
+
+A defect on a rolling-element bearing is struck once each time a ball passes over it, so its impacts repeat at a rate set by the bearing's geometry and the shaft speed $f_r$. For the drive-end bearing, an SKF 6205 with $n = 9$ balls of diameter $d = 0.3126$ in on a pitch diameter $D = 1.537$ in and no contact angle,
+
+$$\mathrm{BPFO} = \frac{n}{2}\left(1 - \frac{d}{D}\right) f_r = 3.585\, f_r, \qquad \mathrm{BPFI} = \frac{n}{2}\left(1 + \frac{d}{D}\right) f_r = 5.415\, f_r$$
+
+$$\mathrm{BSF} = \frac{D}{2d}\left(1 - \frac{d^2}{D^2}\right) f_r = 2.357\, f_r$$
+
+for an outer-race defect, an inner-race defect and a ball defect. A ball defect strikes both races on each spin, so it repeats at twice its spin frequency, $4.714\, f_r$. At 1797 rpm these are 107, 162 and 141 Hz.
+
+Each impact is brief, and what the accelerometer records is the structure ringing at its resonance, a few kilohertz, once per impact. The fault frequency lives in how often that ringing starts, not in the ringing itself. Band-passing the signal around the resonance (2 to 5 kHz), taking its envelope with the Hilbert transform and reading the envelope's spectrum recovers the impact rate. This is envelope demodulation, and `src/features/envelope.py` implements it.
+
+**Physics checks the model.** For every window, `src/evaluation/physics.py` reads the envelope spectrum at each fault frequency and its first three harmonics, against the spectrum's noise floor. Physics names the fault whose peaks stand at least four times above the floor, or calls the bearing normal. No training is involved.
+
+<p>
+<picture>
+  <img src="reports/figures/physics.png" alt="Windows named correctly by envelope physics alone and by the model">
+</picture>
+<br>
+<sub><b>Physics and model.</b> The share of drive-end windows, across all four loads, whose condition is named correctly by envelope physics alone and by the released model. Physics and the model agree on every normal, inner-race and outer-race window. On ball-fault windows the envelope shows no peak at twice the ball spin frequency, only about 1.3 times its noise floor, and physics calls the bearing normal. The model still names them, from what else the ball defect does to the signal.</sub>
+</p>
+
+Ball faults in this dataset are known to be hard to see by envelope analysis (Smith and Randall, *Mechanical Systems and Signal Processing*, 2015). Here that is where the learned model earns its place: physics confirms its decisions wherever physics can see, and the model carries the one case physics cannot.
 
 ## How It Performs
 

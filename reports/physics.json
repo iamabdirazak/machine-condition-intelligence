@@ -1,0 +1,28 @@
+{
+  "windows": 928,
+  "physics_matches_label": 0.75,
+  "model_matches_label": 1.0,
+  "model_agrees_with_physics": 0.75,
+  "by_condition": {
+    "normal": {
+      "physics_matches_label": 1.0,
+      "model_matches_label": 1.0,
+      "model_agrees_with_physics": 1.0
+    },
+    "inner-race": {
+      "physics_matches_label": 1.0,
+      "model_matches_label": 1.0,
+      "model_agrees_with_physics": 1.0
+    },
+    "ball": {
+      "physics_matches_label": 0.0,
+      "model_matches_label": 1.0,
+      "model_agrees_with_physics": 0.0
+    },
+    "outer-race": {
+      "physics_matches_label": 1.0,
+      "model_matches_label": 1.0,
+      "model_agrees_with_physics": 1.0
+    }
+  }
+}
